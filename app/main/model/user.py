@@ -1,6 +1,7 @@
-from app import db
+
+from .. import db, flask_bcrypt
 from datetime import datetime
-from flask_bcrypt import bcrypt
+
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -21,10 +22,10 @@ class User(db.Model):
 
     @password.setter
     def password(self, password):
-        self.password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+        self.password_hash = flask_bcrypt.generate_password_hash(password).decode("utf-8")
 
     def verify_password(self, password):
-        return bcrypt.check_password_hash(self.password_hash, password)
+        return flask_bcrypt.check_password_hash(self.password_hash, password)
 
     def __repr__(self):
         return f"<User {self.username}>"
