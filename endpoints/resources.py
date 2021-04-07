@@ -1,5 +1,5 @@
-from models import CartItem, User, Cart, Voucher, Product
-from db import session
+from endpoints.models import CartItem, User, Cart, Voucher, Product
+from database import db
 
 from flask import jsonify
 from flask_restx import abort
@@ -51,13 +51,13 @@ parser.add_argument('product_id', type=str)
 class ProductResource(Resource):
     @marshal_with(product_fields)
     def get(self):
-        productlist = session.query(Product).all()
+        productlist = db.session.query(Product).all()
         return productlist
 
 class ProductByProductIdResource(Resource):
     @marshal_with(product_fields)
     def get(self, id):
-        product = session.query(Product).filter(Product.id == id).all()
+        product = db.session.query(Product).filter(Product.id == id).all()
         if not product:
             abort(404, message="Product {} doesn't exist".format(id))
         return product
@@ -65,7 +65,7 @@ class ProductByProductIdResource(Resource):
 class VoucherByUserIdResource(Resource):
     @marshal_with(voucher_fields)
     def get(self, user_id):
-        voucherlist = session.query(Voucher).filter(Voucher.user_id == user_id).all()
+        voucherlist = db.session.query(Voucher).filter(Voucher.user_id == user_id).all()
         if not voucherlist:
             abort(404, message="User {} doesn't have vouchers or doesn't exist".format(user_id))
         return voucherlist
@@ -73,7 +73,7 @@ class VoucherByUserIdResource(Resource):
 class VoucherByVoucherIdResource(Resource):
     @marshal_with(voucher_fields)
     def get(self, id):
-        voucher = session.query(Voucher).filter(Voucher.id == id).all()
+        voucher = db.session.query(Voucher).filter(Voucher.id == id).all()
         if not voucher:
             abort(404, message="Voucher {} doesn't exist".format(id))
         return voucher
@@ -81,7 +81,7 @@ class VoucherByVoucherIdResource(Resource):
 class CartByUserIdResource(Resource):
     @marshal_with(cart_fields)
     def get(self, user_id):
-        cartlist = session.query(Cart).filter(Cart.user_id == user_id).all()
+        cartlist = db.session.query(Cart).filter(Cart.user_id == user_id).all()
         if not cartlist:
             abort(404, message="User {} doesn't have carts or doesn't exist".format(user_id))
         return cartlist
@@ -89,7 +89,7 @@ class CartByUserIdResource(Resource):
 class CartByCartIdResource(Resource):
     @marshal_with(cart_fields)
     def get(self, id):
-        cart = session.query(Cart).filter(Cart.id == id).all()
+        cart = db.session.query(Cart).filter(Cart.id == id).all()
         if not cart:
             abort(404, message="Cart {} doesn't exist".format(id))
         return cart
@@ -101,9 +101,9 @@ class CartByCartIdResource(Resource):
 #         parsed_args = parser.parse_args()
 #         new_activity = ParkLog(activity = parsed_args['activity'], cardid = parsed_args['cardid'], parkid = parsed_args['parkid'])
         
-#         session.add(new_activity)
+#         db.session.add(new_activity)
         
-#         parkstatus = session.query(ParkStatus).filter(ParkStatus.parkid == parsed_args['parkid']).first()
+#         parkstatus = db.session.query(ParkStatus).filter(ParkStatus.parkid == parsed_args['parkid']).first()
         
 #         if parsed_args['activity'] == 'I':
 #             parkstatus.available -= 1
@@ -112,8 +112,8 @@ class CartByCartIdResource(Resource):
 #         else:
 #             abort(404, message="Activity values must be I (in) or O (out)")
         
-#         session.add(parkstatus)
-#         session.commit()
+#         db.session.add(parkstatus)
+#         db.session.commit()
 
 #         return parkstatus, 201
 
@@ -121,7 +121,7 @@ class CartByCartIdResource(Resource):
 # class ParkStatusResource(Resource):
 #     @marshal_with(parkstatus_fields)
 #     def get(self, parkid):
-#         parkstatus = session.query(ParkStatus).filter(ParkStatus.parkid == parkid).first()
+#         parkstatus = db.session.query(ParkStatus).filter(ParkStatus.parkid == parkid).first()
 #         if not parkstatus:
 #             abort(404, message="Park {} doesn't exist".format(parkid))
 #         return parkstatus
@@ -133,9 +133,9 @@ class CartByCartIdResource(Resource):
 #         parsed_args = parser.parse_args()
 #         new_activity = ParkLog(activity = parsed_args['activity'], cardid = parsed_args['cardid'], parkid = parsed_args['parkid'])
         
-#         session.add(new_activity)
+#         db.session.add(new_activity)
         
-#         parkstatus = session.query(ParkStatus).filter(ParkStatus.parkid == parsed_args['parkid']).first()
+#         parkstatus = db.session.query(ParkStatus).filter(ParkStatus.parkid == parsed_args['parkid']).first()
         
 #         if parsed_args['activity'] == 'I':
 #             parkstatus.available -= 1
@@ -144,15 +144,15 @@ class CartByCartIdResource(Resource):
 #         else:
 #             abort(404, message="Activity values must be I (in) or O (out)")
         
-#         session.add(parkstatus)
-#         session.commit()
+#         db.session.add(parkstatus)
+#         db.session.commit()
 
 #         return parkstatus, 201
 
 # class ParkLogByCardIdResource(Resource):
 #     @marshal_with(parklogbycardid_fields)
 #     def get(self, cardid):
-#         parklog = session.query(ParkLog).filter(ParkLog.cardid == cardid).all()
+#         parklog = db.session.query(ParkLog).filter(ParkLog.cardid == cardid).all()
 #         if not parklog:
 #             abort(404, message="CardID {} doesn't have logs or doesn't exist".format(cardid))
 #         return parklog

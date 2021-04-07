@@ -1,18 +1,18 @@
 import os
 from flask import Flask
 from flask_restx import Api
+from database import db
 from dotenv import load_dotenv
-from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 api = Api(app)
-db = SQLAlchemy(app)
 
-from resources import VoucherByUserIdResource, CartByUserIdResource, ProductResource, ProductByProductIdResource, VoucherByVoucherIdResource, CartByCartIdResource
+from endpoints.resources import VoucherByUserIdResource, CartByUserIdResource, ProductResource, ProductByProductIdResource, VoucherByVoucherIdResource, CartByCartIdResource
 
 api.add_resource(VoucherByUserIdResource, '/vouchers/<string:user_id>', endpoint='voucherlist')
 api.add_resource(VoucherByVoucherIdResource, '/voucher/<string:id>', endpoint='voucher')
