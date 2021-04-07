@@ -1,6 +1,8 @@
 version: '3'
 services:
     api:
+      environment:
+        DATABASE_URL: "postgresql://admin:admin@db/marketdb"
       build: .
       ports:
         - "5000:5000"
@@ -10,7 +12,7 @@ services:
       environment:
         POSTGRES_USER: admin
         POSTGRES_PASSWORD: admin
-        POSTGRES_DB: market
+        POSTGRES_DB: marketdb
       image: postgres:latest
       networks:
         - default
