@@ -40,7 +40,7 @@ cartItem_fields = {
     'id': fields.Integer,
     'cart_id': fields.Integer,
     'product_id': fields.Integer,
-    'uri': fields.Url('cart_item', absolute=True),
+    'uri': fields.Url('product', absolute=True),
 }
 
 parser = reqparse.RequestParser()
@@ -93,6 +93,14 @@ class CartByCartIdResource(Resource):
         if not cart:
             abort(404, message="Cart {} doesn't exist".format(id))
         return cart
+
+class CartItemsByCartIdResource(Resource):
+    @marshal_with(cartItem_fields)
+    def get(self, cart_id):
+        cartitemlist = db.session.query(CartItem).filter(CartItem.cart_id == cart_id).all()
+        if not cartitemlist:
+            abort(404, message="Cart {} doesn't have any item or doesn't exist".format(cart_id))
+        return cartitemlist
 
 # class ParkLogResource(Resource):
 #     @marshal_with(parklog_fields)
