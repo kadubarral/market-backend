@@ -22,6 +22,7 @@ api.add_resource(CartByCartIdResource, '/cart/<string:id>', endpoint='cart')
 api.add_resource(ProductByProductIdResource, '/product/<string:id>', endpoint='product')
 api.add_resource(ProductResource, '/products', endpoint='productlist')
 api.add_resource(CartItemsByCartIdResource, '/cart_items/<string:cart_id>', endpoint='cartitemlist')
+api.add_resource(CartItemsByCartItemIdResource, '/cart_items/<string:id>', endpoint='cartitem')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

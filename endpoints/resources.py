@@ -1,3 +1,4 @@
+from flask_restx.marshalling import marshal, marshal_with_field
 from endpoints.models import CartItem, User, Cart, Voucher, Product
 from database import db
 
@@ -40,7 +41,7 @@ cartItem_fields = {
     'id': fields.Integer,
     'cart_id': fields.Integer,
     'product_id': fields.Integer,
-    'uri': fields.Url('product', absolute=True),
+    'uri': fields.Url('cartitem', absolute=True),
 }
 
 parser = reqparse.RequestParser()
@@ -49,13 +50,13 @@ parser.add_argument('product_id', type=str)
 # parser.add_argument('parkid', type=int)
 
 class ProductResource(Resource):
-    @marshal_with(product_fields)
+    @marshal_with(product_fields, "data")
     def get(self):
         productlist = db.session.query(Product).all()
         return productlist
 
 class ProductByProductIdResource(Resource):
-    @marshal_with(product_fields)
+    @marshal_with(product_fields, "data")
     def get(self, id):
         product = db.session.query(Product).filter(Product.id == id).all()
         if not product:
@@ -63,7 +64,7 @@ class ProductByProductIdResource(Resource):
         return product
 
 class VoucherByUserIdResource(Resource):
-    @marshal_with(voucher_fields)
+    @marshal_with(voucher_fields, "data")
     def get(self, user_id):
         voucherlist = db.session.query(Voucher).filter(Voucher.user_id == user_id).all()
         if not voucherlist:
@@ -71,7 +72,7 @@ class VoucherByUserIdResource(Resource):
         return voucherlist
 
 class VoucherByVoucherIdResource(Resource):
-    @marshal_with(voucher_fields)
+    @marshal_with(voucher_fields, "data")
     def get(self, id):
         voucher = db.session.query(Voucher).filter(Voucher.id == id).all()
         if not voucher:
@@ -79,7 +80,7 @@ class VoucherByVoucherIdResource(Resource):
         return voucher
 
 class CartByUserIdResource(Resource):
-    @marshal_with(cart_fields)
+    @marshal_with(cart_fields, "data")
     def get(self, user_id):
         cartlist = db.session.query(Cart).filter(Cart.user_id == user_id).all()
         if not cartlist:
@@ -87,7 +88,7 @@ class CartByUserIdResource(Resource):
         return cartlist
 
 class CartByCartIdResource(Resource):
-    @marshal_with(cart_fields)
+    @marshal_with(cart_fields, "data")
     def get(self, id):
         cart = db.session.query(Cart).filter(Cart.id == id).all()
         if not cart:
@@ -95,12 +96,20 @@ class CartByCartIdResource(Resource):
         return cart
 
 class CartItemsByCartIdResource(Resource):
-    @marshal_with(cartItem_fields)
+    @marshal_with(cartItem_fields, "data")
     def get(self, cart_id):
         cartitemlist = db.session.query(CartItem).filter(CartItem.cart_id == cart_id).all()
         if not cartitemlist:
             abort(404, message="Cart {} doesn't have any item or doesn't exist".format(cart_id))
         return cartitemlist
+
+class CartItemsByCartItemIdResource(Resource):
+    @marshal_with(cartItem_fields, "data")
+    def get(self, id):
+        cartitem = db.session.query(CartItem).filter(CartItem.id == id).all()
+        if not cartitem:
+            abort(404, message="CartItem {} doesn't exist".format(id))
+        return cartitem
 
 # class ParkLogResource(Resource):
 #     @marshal_with(parklog_fields)
