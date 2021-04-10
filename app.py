@@ -1,7 +1,7 @@
 import os
 from flask import Flask
 from database import db
-from api import api, ns_product, ns_cart, ns_voucher
+from api import api, ns_product, ns_cart, ns_voucher, ns_user
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,6 +14,7 @@ api.init_app(app)
 
 from endpoints.resources import *
 
+ns_user.add_resource(UserResource, "/")
 ns_voucher.add_resource(VoucherByUserIdResource, '/<string:user_id>', endpoint='voucherlist')
 ns_voucher.add_resource(VoucherByVoucherIdResource, '/<string:id>', endpoint='voucher')
 ns_cart.add_resource(CartByUserIdResource, '/<string:user_id>', endpoint='cartlist')

@@ -1,8 +1,12 @@
+import uuid
+import flask
+
+from sqlalchemy.dialects.postgresql.base import UUID
 from endpoints.models import CartItem, User, Cart, Voucher, Product
 from database import db
 from sqlalchemy import func
-from api import ns_product
-
+from api import ns_product, ns_cart, ns_voucher
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_restx import abort
 from flask_restx import fields, Resource, marshal_with, reqparse
 
@@ -44,7 +48,6 @@ cartItem_fields = {
     'uri': fields.Url('cartitem', absolute=True),
 }
 
-
 cartsummary_fields = {
     'id': fields.Integer,
     'added_on': fields.DateTime(dt_format='rfc822'),
@@ -57,9 +60,36 @@ cartdetail_fields = {
     'price': fields.Float,
 }
 
-parser = reqparse.RequestParser()
-parser.add_argument('title', type=str)
-parser.add_argument('price', type=float)
+user_parser = reqparse.RequestParser()
+user_parser.add_argument('name', type=str)
+user_parser.add_argument('username', type=str)
+user_parser.add_argument('email', type=str)
+user_parser.add_argument('password', type=str)
+
+class UserResource(Resource):
+    @ns_product.expect(user_parser)
+    def post(self):
+        parsed_args = user_parser.parse_args()
+
+        user_uuid = uuid.uuid4()
+
+        password_hash = generate_password_hash(parsed_args['password'])
+
+        new_user = User(name = parsed_args['name'], 
+                            username = parsed_args['username'],
+                            email = parsed_args['email'],
+                            password_hash = password_hash,
+                            uuid = user_uuid)
+        
+        db.session.add(new_user)
+        db.session.commit()
+
+        return flask.jsonify(user_uuid)
+
+
+product_parser = reqparse.RequestParser()
+product_parser.add_argument('title', type=str)
+product_parser.add_argument('price', type=float)
 
 class ProductResource(Resource):
     @marshal_with(product_fields, "data")
@@ -67,16 +97,16 @@ class ProductResource(Resource):
         productlist = db.session.query(Product).all()
         return productlist
 
-    @ns_product.expect(parser)
+    @ns_product.expect(product_parser)
     def post(self):
-        parsed_args = parser.parse_args()
+        parsed_args = product_parser.parse_args()
         new_product = Product(title = parsed_args['title'], 
                                 price = parsed_args['price'])
 
         db.session.add(new_product)
         db.session.commit()
 
-        return 201
+        return "Product inserted"
 
 class ProductByProductIdResource(Resource):
     @marshal_with(product_fields, "data")
