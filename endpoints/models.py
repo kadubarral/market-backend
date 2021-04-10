@@ -37,7 +37,7 @@ class Voucher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(50))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    discount = db.Column(db.Integer)
+    discount = db.Column(db.Float)
     added_on = db.Column(TIMESTAMP, default=db.func.current_timestamp())
 
 class Cart(db.Model):
