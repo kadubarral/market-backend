@@ -1,10 +1,8 @@
-from flask_restx.marshalling import marshal, marshal_with_field
-from sqlalchemy.sql.expression import outerjoin
 from endpoints.models import CartItem, User, Cart, Voucher, Product
 from database import db
 from sqlalchemy import func
+from api import ns_product
 
-from flask import jsonify
 from flask_restx import abort
 from flask_restx import fields, Resource, marshal_with, reqparse
 
@@ -60,15 +58,25 @@ cartdetail_fields = {
 }
 
 parser = reqparse.RequestParser()
-parser.add_argument('user_id', type=str)
-parser.add_argument('product_id', type=str)
-# parser.add_argument('parkid', type=int)
+parser.add_argument('title', type=str)
+parser.add_argument('price', type=float)
 
 class ProductResource(Resource):
     @marshal_with(product_fields, "data")
     def get(self):
         productlist = db.session.query(Product).all()
         return productlist
+
+    @ns_product.expect(parser)
+    def post(self):
+        parsed_args = parser.parse_args()
+        new_product = Product(title = parsed_args['title'], 
+                                price = parsed_args['price'])
+
+        db.session.add(new_product)
+        db.session.commit()
+
+        return 201
 
 class ProductByProductIdResource(Resource):
     @marshal_with(product_fields, "data")
