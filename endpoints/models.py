@@ -15,9 +15,11 @@ class User(db.Model):
     uuid = db.Column(UUID(as_uuid=True), nullable=False, default=uuid.uuid4)
     name = db.Column(db.String(120))
     username = db.Column(db.String(50), unique=True)
-    email = db.Column(db.String(120), unique=True)
     points = db.Column(db.Float(10,2))
-    password_hash = db.Column(db.String(120))
+    userPublicKey = db.Column(db.String(500))
+    cardNumber = db.Column(db.String(50))
+    cardExpirationDate = db.Column(db.Date)
+    cardCvv = db.Column(db.String(3))
 
     # def __init__(self, username, email, password):
     #     self.username = username

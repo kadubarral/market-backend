@@ -2,6 +2,7 @@ import uuid
 import flask
 
 from sqlalchemy.dialects.postgresql.base import UUID
+from sqlalchemy.sql.sqltypes import Date
 from endpoints.models import CartItem, User, Cart, Voucher, Product
 from database import db
 from sqlalchemy import func
@@ -63,8 +64,10 @@ cartdetail_fields = {
 user_parser = reqparse.RequestParser()
 user_parser.add_argument('name', type=str)
 user_parser.add_argument('username', type=str)
-user_parser.add_argument('email', type=str)
-user_parser.add_argument('password', type=str)
+user_parser.add_argument('userPublicKey', type=str)
+user_parser.add_argument('cardNumber', type=str)
+user_parser.add_argument('cardExpirationDate', type=str)
+user_parser.add_argument('cardCvv', type=str)
 
 class UserResource(Resource):
     @ns_product.expect(user_parser)
@@ -73,18 +76,22 @@ class UserResource(Resource):
 
         user_uuid = uuid.uuid4()
 
-        password_hash = generate_password_hash(parsed_args['password'])
+        #password_hash = generate_password_hash(parsed_args['password'])
 
         new_user = User(name = parsed_args['name'], 
                             username = parsed_args['username'],
-                            email = parsed_args['email'],
-                            password_hash = password_hash,
+                            userPublicKey = parsed_args['userPublicKey'],
+                            cardNumber = parsed_args['cardNumber'],
+                            cardExpirationDate = parsed_args['cardExpirationDate'],
+                            cardCvv = parsed_args['cardCvv'],
                             uuid = user_uuid)
         
         db.session.add(new_user)
         db.session.commit()
 
-        return flask.jsonify(user_uuid)
+        key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0FPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB"
+
+        return flask.jsonify('uuid:' + str(user_uuid) + ', mktKey: ' + key)
 
 
 product_parser = reqparse.RequestParser()
