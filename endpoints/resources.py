@@ -89,9 +89,9 @@ class UserResource(Resource):
         db.session.add(new_user)
         db.session.commit()
 
-        key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0FPqri0cb2JZfXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB"
+        key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxFVM+d5p4n/P9kIhwyhoJzPHJUMdO9cnRwLsOR+VxXYTRRzT2MG6WTULDcoELVFK60NbtTDkKX6VqgOfuqB2uSRnQ4yIFKcSe8s+IzbnULHYXUZJj1lp1svsfXx2p2gLmPCbmD3Yx1TysTvFKP15eAGpBlI0QKMK4ZLvHxFAxQs4JJ6e1i1pKhaqGvyIlKcYafYmoWA6nYDQnECAiQqkexjOW0fUouXfBBMtT9BtXrw/Onu4KhUN45tXqdFfNVLOtfNnhsSaPlpgx2aaBK5xLQHDGz2SBYvZBGmJa9Fx53xRGpH5bfWVNmbKZq1diupFMaXs68mG2KEckNIjCv8+KwIDAQAB"
 
-        return flask.jsonify('uuid:' + str(user_uuid) + ', mktKey: ' + key)
+        return flask.jsonify('{uuid: ' + str(user_uuid) + ', mktKey: ' + key +'}')
 
 
 product_parser = reqparse.RequestParser()
