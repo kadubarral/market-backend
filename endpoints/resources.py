@@ -2,6 +2,7 @@ import uuid
 import flask
 
 from sqlalchemy.dialects.postgresql.base import UUID
+from sqlalchemy.sql.functions import array_agg
 from sqlalchemy.sql.sqltypes import Date
 from endpoints.models import CartItem, User, Cart, Voucher, Product
 from database import db
@@ -208,25 +209,28 @@ class CartDetailByCartIdResource(Resource):
             abort(404, message="Cart {} doesn't exist".format(id))
         return cartdetail
 
-# class ParkLogResource(Resource):
-#     @marshal_with(parklog_fields)
-#     @marshal_with(parkstatus_fields)
-#     def post(self):
-#         parsed_args = parser.parse_args()
-#         new_activity = ParkLog(activity = parsed_args['activity'], cardid = parsed_args['cardid'], parkid = parsed_args['parkid'])
-        
-#         db.session.add(new_activity)
-        
-#         parkstatus = db.session.query(ParkStatus).filter(ParkStatus.parkid == parsed_args['parkid']).first()
-        
-#         if parsed_args['activity'] == 'I':
-#             parkstatus.available -= 1
-#         elif parsed_args['activity'] == 'O':
-#             parkstatus.available += 1
-#         else:
-#             abort(404, message="Activity values must be I (in) or O (out)")
-        
-#         db.session.add(parkstatus)
-#         db.session.commit()
+cart_parser = reqparse.RequestParser()
+cart_parser.add_argument('user_id', type=str)
+cart_parser.add_argument('voucher_id', type=int)
+cart_parser.add_argument('product_id', action='append')
 
-#         return parkstatus, 201
+class CartResource(Resource):
+    @ns_cart.expect(cart_parser)
+    def post(self):
+        parsed_args = cart_parser.parse_args()
+        new_cart = Cart(user_id = parsed_args['user_id'], 
+                        voucher_id = parsed_args['voucher_id'])
+
+        db.session.add(new_cart)
+        db.session.flush()
+        print("------------id " + str(new_cart.id))
+        
+        for x in parsed_args['product_id']:
+            new_cart_item = CartItem(cart_id = new_cart.id, 
+                                product_id = x)
+
+            db.session.add(new_cart_item)
+
+        db.session.commit()
+
+        return "Cart paid"

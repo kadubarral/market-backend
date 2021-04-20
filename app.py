@@ -25,6 +25,7 @@ ns_cart.add_resource(CartItemsByCartIdResource, '/items/<string:cart_id>', endpo
 ns_cart.add_resource(CartItemsByCartItemIdResource, '/items/<string:id>', endpoint='cartitem')
 ns_cart.add_resource(CartSummaryByUserIdResource, '/summary/<string:user_id>', endpoint='cartsummary')
 ns_cart.add_resource(CartDetailByCartIdResource, '/detail/<string:cart_id>', endpoint='cartdetail')
+ns_cart.add_resource(CartResource, '/', endpoint='new_cart')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
