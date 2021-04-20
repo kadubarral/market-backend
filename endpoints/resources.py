@@ -2,6 +2,7 @@ import uuid
 import flask
 
 from sqlalchemy.dialects.postgresql.base import UUID
+from sqlalchemy.orm import query
 from sqlalchemy.sql.functions import array_agg
 from sqlalchemy.sql.sqltypes import Date
 from endpoints.models import CartItem, User, Cart, Voucher, Product
@@ -212,6 +213,7 @@ class CartDetailByCartIdResource(Resource):
 cart_parser = reqparse.RequestParser()
 cart_parser.add_argument('user_id', type=str)
 cart_parser.add_argument('voucher_id', type=int)
+cart_parser.add_argument('total', type=int)
 cart_parser.add_argument('product_id', action='append')
 
 class CartResource(Resource):
@@ -223,13 +225,34 @@ class CartResource(Resource):
 
         db.session.add(new_cart)
         db.session.flush()
-        print("------------id " + str(new_cart.id))
         
         for x in parsed_args['product_id']:
             new_cart_item = CartItem(cart_id = new_cart.id, 
                                 product_id = x)
 
             db.session.add(new_cart_item)
+
+        if parsed_args['voucher_id'] is not None:
+            #db.session.query(Voucher).filter(Voucher.id == parsed_args['voucher_id']).delete()
+            voucher = Voucher.query.get(parsed_args['voucher_id'])
+            voucher.used = True
+            db.session.flush()
+
+        user = User.query.get(parsed_args['user_id'])
+
+        if user.points is None: 
+            user.points = 0
+        user.points += parsed_args['total']
+        db.session.flush()
+
+        if user.points >= 100:
+            total_vouchers = int(user.points / 100)
+            for vouchers in range(total_vouchers):
+                new_voucher = Voucher(user_id = user.id,
+                                    discount = 15)
+                db.session.add(new_voucher)
+
+            user.points -= (total_vouchers *100)
 
         db.session.commit()
 

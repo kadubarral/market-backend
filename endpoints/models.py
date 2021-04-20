@@ -44,6 +44,7 @@ class Voucher(db.Model):
     code = db.Column(UUID(as_uuid=True), nullable=False, default=uuid.uuid4)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     discount = db.Column(db.Float)
+    used = db.Column(db.Boolean, default=False)
     added_on = db.Column(TIMESTAMP, default=db.func.current_timestamp())
 
 class Cart(db.Model):
