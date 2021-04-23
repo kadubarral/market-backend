@@ -32,6 +32,7 @@ voucher_fields = {
     'code': fields.String,
     'user_id': fields.Integer,
     'discount': fields.Float,
+    'used': fields.Boolean,
     'added_on': fields.DateTime(dt_format='rfc822'),
     'uri': fields.Url('voucher', absolute=True),
 }
@@ -93,7 +94,9 @@ class UserResource(Resource):
 
         key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxFVM+d5p4n/P9kIhwyhoJzPHJUMdO9cnRwLsOR+VxXYTRRzT2MG6WTULDcoELVFK60NbtTDkKX6VqgOfuqB2uSRnQ4yIFKcSe8s+IzbnULHYXUZJj1lp1svsfXx2p2gLmPCbmD3Yx1TysTvFKP15eAGpBlI0QKMK4ZLvHxFAxQs4JJ6e1i1pKhaqGvyIlKcYafYmoWA6nYDQnECAiQqkexjOW0fUouXfBBMtT9BtXrw/Onu4KhUN45tXqdFfNVLOtfNnhsSaPlpgx2aaBK5xLQHDGz2SBYvZBGmJa9Fx53xRGpH5bfWVNmbKZq1diupFMaXs68mG2KEckNIjCv8+KwIDAQAB"
 
-        return flask.jsonify('{uuid: ' + str(user_uuid) + ', mktKey: ' + key +'}')
+        return flask.jsonify(uuid=str(user_uuid), 
+                            id=new_user.id,
+                            mktKey= key)
 
 
 product_parser = reqparse.RequestParser()
@@ -213,7 +216,7 @@ class CartDetailByCartIdResource(Resource):
 cart_parser = reqparse.RequestParser()
 cart_parser.add_argument('user_id', type=str)
 cart_parser.add_argument('voucher_id', type=int)
-cart_parser.add_argument('total', type=int)
+cart_parser.add_argument('total', type=float)
 cart_parser.add_argument('product_id', action='append')
 
 class CartResource(Resource):
