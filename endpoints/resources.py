@@ -29,7 +29,6 @@ product_fields = {
 }
 
 voucher_fields = {
-    'id': fields.Integer,
     'code': fields.String,
     'user_uuid': fields.String,
     'discount': fields.Float,
@@ -41,7 +40,7 @@ voucher_fields = {
 cart_fields = {
     'id': fields.Integer,
     'user_uuid': fields.String,
-    'voucher_id': fields.Integer,
+    'voucher_code': fields.Integer,
     'added_on': fields.DateTime(dt_format='rfc822'),
     'uri': fields.Url('cart', absolute=True),
 }
@@ -136,10 +135,10 @@ class VoucherByUserIdResource(Resource):
             abort(404, message="User {} doesn't have vouchers or doesn't exist".format(user_uuid))
         return voucherlist
 
-class VoucherByVoucherIdResource(Resource):
+class VoucherByVoucherCodeResource(Resource):
     @marshal_with(voucher_fields, "data")
-    def get(self, id):
-        voucher = db.session.query(Voucher).filter(Voucher.id == id).all()
+    def get(self, code):
+        voucher = db.session.query(Voucher).filter(Voucher.code == code).all()
         if not voucher:
             abort(404, message="Voucher {} doesn't exist".format(id))
         return voucher
@@ -185,7 +184,7 @@ class CartSummaryByUserIdResource(Resource):
                                     func.sum(Product.price * (100-func.coalesce(Voucher.discount,0))/100).label("total")) \
                 .join(CartItem, Cart.id==CartItem.cart_id,) \
                 .join(Product, CartItem.product_uuid==Product.uuid) \
-                .outerjoin(Voucher, Cart.voucher_id==Voucher.id) \
+                .outerjoin(Voucher, Cart.voucher_code==Voucher.code) \
                 .filter(Cart.user_uuid == user_uuid) \
                 .group_by(Cart.id, Cart.added_on, Voucher.discount) \
                 .all()
@@ -207,7 +206,7 @@ class CartDetailByCartIdResource(Resource):
 
 cart_parser = reqparse.RequestParser()
 cart_parser.add_argument('user_uuid', type=str)
-cart_parser.add_argument('voucher_id', type=int)
+cart_parser.add_argument('voucher_code', type=int)
 cart_parser.add_argument('total', type=Decimal)
 cart_parser.add_argument('product_uuid', action='append')
 
@@ -216,7 +215,7 @@ class CartResource(Resource):
     def post(self):
         parsed_args = cart_parser.parse_args()
         new_cart = Cart(user_uuid = parsed_args['user_uuid'], 
-                        voucher_id = parsed_args['voucher_id'])
+                        voucher_code = parsed_args['voucher_code'])
 
         db.session.add(new_cart)
         db.session.flush()
@@ -227,9 +226,8 @@ class CartResource(Resource):
 
             db.session.add(new_cart_item)
 
-        if parsed_args['voucher_id'] is not None:
-            #db.session.query(Voucher).filter(Voucher.id == parsed_args['voucher_id']).delete()
-            voucher = Voucher.query.get(parsed_args['voucher_id'])
+        if parsed_args['voucher_code'] is not None:
+            voucher = Voucher.query.get(parsed_args['voucher_code'])
             voucher.used = True
             db.session.flush()
 

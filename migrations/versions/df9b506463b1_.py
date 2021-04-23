@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: c1493b04c4fe
+Revision ID: df9b506463b1
 Revises: 
-Create Date: 2021-04-23 12:24:30.742593
+Create Date: 2021-04-23 14:48:35.850674
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'c1493b04c4fe'
+revision = 'df9b506463b1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -37,22 +37,21 @@ def upgrade():
     sa.UniqueConstraint('username')
     )
     op.create_table('vouchers',
-    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('code', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('user_uuid', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('discount', sa.Float(), nullable=True),
     sa.Column('used', sa.Boolean(), nullable=True),
     sa.Column('added_on', sa.TIMESTAMP(), nullable=True),
     sa.ForeignKeyConstraint(['user_uuid'], ['users.uuid'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('code')
     )
     op.create_table('carts',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_uuid', postgresql.UUID(as_uuid=True), nullable=True),
-    sa.Column('voucher_id', sa.Integer(), nullable=True),
+    sa.Column('voucher_code', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('added_on', sa.TIMESTAMP(), nullable=True),
     sa.ForeignKeyConstraint(['user_uuid'], ['users.uuid'], ),
-    sa.ForeignKeyConstraint(['voucher_id'], ['vouchers.id'], ),
+    sa.ForeignKeyConstraint(['voucher_code'], ['vouchers.code'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('cart_item',

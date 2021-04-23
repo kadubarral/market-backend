@@ -39,8 +39,7 @@ class Product(db.Model):
 
 class Voucher(db.Model):
     __tablename__ = 'vouchers'
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(UUID(as_uuid=True), nullable=False, default=uuid.uuid4)
+    code = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_uuid = db.Column(UUID(as_uuid=True), db.ForeignKey('users.uuid'))
     discount = db.Column(db.Float)
     used = db.Column(db.Boolean, default=False)
@@ -50,7 +49,7 @@ class Cart(db.Model):
     __tablename__ = 'carts'
     id = db.Column(db.Integer, primary_key=True)
     user_uuid = db.Column(UUID(as_uuid=True), db.ForeignKey('users.uuid'))
-    voucher_id = db.Column(db.Integer, db.ForeignKey('vouchers.id'), nullable=True)
+    voucher_code = db.Column(UUID(as_uuid=True), db.ForeignKey('vouchers.code'), nullable=True)
     added_on = db.Column(TIMESTAMP, default=db.func.current_timestamp())
 
 class CartItem(db.Model):

@@ -16,7 +16,7 @@ from endpoints.resources import *
 
 ns_user.add_resource(UserResource, "/")
 ns_voucher.add_resource(VoucherByUserIdResource, '/<string:user_uuid>', endpoint='voucherlist')
-ns_voucher.add_resource(VoucherByVoucherIdResource, '/<string:id>', endpoint='voucher')
+ns_voucher.add_resource(VoucherByVoucherCodeResource, '/code/<string:code>', endpoint='voucher')
 ns_cart.add_resource(CartByUserIdResource, '/<string:user_uuid>', endpoint='cartlist')
 ns_cart.add_resource(CartByCartIdResource, '/<string:id>', endpoint='cart')
 ns_product.add_resource(ProductByProductIdResource, '/<string:uuid>', endpoint='product')
