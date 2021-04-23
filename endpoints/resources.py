@@ -15,9 +15,10 @@ from flask_restx import abort
 from flask_restx import fields, Resource, marshal_with, reqparse
 
 user_fields = {
-    'uuid': UUID,
+    'uuid': fields.String,
+    'name': fields.String,
     'username': fields.String,
-    'email': fields.String,
+    'userPublicKey': fields.String,
     'uri': fields.Url('user', absolute=True),
 }
 
@@ -72,6 +73,12 @@ user_parser.add_argument('cardNumber', type=str)
 user_parser.add_argument('cardExpirationDate', type=str)
 user_parser.add_argument('cardCvv', type=str)
 
+
+class UserbyUserUUIDResource(Resource):
+    @marshal_with(user_fields, "data")
+    def get(self, uuid):
+        user = db.session.query(User).filter(User.uuid == uuid).all()
+        return user
 class UserResource(Resource):
     @ns_product.expect(user_parser)
     def post(self):

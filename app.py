@@ -15,6 +15,7 @@ api.init_app(app)
 from endpoints.resources import *
 
 ns_user.add_resource(UserResource, "/")
+ns_user.add_resource(UserbyUserUUIDResource, '/<string:uuid>', endpoint='user')
 ns_voucher.add_resource(VoucherByUserIdResource, '/<string:user_uuid>', endpoint='voucherlist')
 ns_voucher.add_resource(VoucherByVoucherCodeResource, '/code/<string:code>', endpoint='voucher')
 ns_cart.add_resource(CartByUserIdResource, '/<string:user_uuid>', endpoint='cartlist')
