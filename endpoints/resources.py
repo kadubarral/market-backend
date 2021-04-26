@@ -9,7 +9,7 @@ from sqlalchemy.sql.sqltypes import Date
 from endpoints.models import CartItem, User, Cart, Voucher, Product
 from database import db
 from sqlalchemy import func
-from api import ns_product, ns_cart, ns_voucher
+from api import ns_product, ns_cart, ns_voucher, ns_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_restx import abort
 from flask_restx import fields, Resource, marshal_with, reqparse
@@ -80,7 +80,7 @@ class UserbyUserUUIDResource(Resource):
         user = db.session.query(User).filter(User.uuid == uuid).all()
         return user
 class UserResource(Resource):
-    @ns_product.expect(user_parser)
+    @ns_user.expect(user_parser)
     def post(self):
         parsed_args = user_parser.parse_args()
 
@@ -106,6 +106,7 @@ class UserResource(Resource):
 
 
 product_parser = reqparse.RequestParser()
+product_parser.add_argument('uuid', type=str)
 product_parser.add_argument('title', type=str)
 product_parser.add_argument('price', type=float)
 
@@ -118,7 +119,8 @@ class ProductResource(Resource):
     @ns_product.expect(product_parser)
     def post(self):
         parsed_args = product_parser.parse_args()
-        new_product = Product(title = parsed_args['title'], 
+        new_product = Product(uuid = parsed_args['uuid'], 
+                                title = parsed_args['title'], 
                                 price = parsed_args['price'])
 
         db.session.add(new_product)
