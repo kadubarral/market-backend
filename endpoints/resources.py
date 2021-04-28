@@ -19,14 +19,14 @@ user_fields = {
     'name': fields.String,
     'username': fields.String,
     'userPublicKey': fields.String,
-    'uri': fields.Url('user', absolute=True),
+    #'uri': fields.Url('user', absolute=True),
 }
 
 product_fields = {
     'uuid': fields.String,
     'title': fields.String,
     'price': fields.Float,
-    'uri': fields.Url('product', absolute=True),
+    #'uri': fields.Url('product', absolute=True),
 }
 
 voucher_fields = {
@@ -35,7 +35,7 @@ voucher_fields = {
     'discount': fields.Float,
     'used': fields.Boolean,
     'added_on': fields.DateTime(dt_format='rfc822'),
-    'uri': fields.Url('voucher', absolute=True),
+    #'uri': fields.Url('voucher', absolute=True),
 }
 
 cart_fields = {
@@ -43,14 +43,14 @@ cart_fields = {
     'user_uuid': fields.String,
     'voucher_code': fields.Integer,
     'added_on': fields.DateTime(dt_format='rfc822'),
-    'uri': fields.Url('cart', absolute=True),
+    #'uri': fields.Url('cart', absolute=True),
 }
 
 cartItem_fields = {
     'id': fields.Integer,
     'cart_id': fields.Integer,
     'product_uuid': fields.String,
-    'uri': fields.Url('cartitem', absolute=True),
+    #'uri': fields.Url('cartitem', absolute=True),
 }
 
 cartsummary_fields = {
@@ -77,7 +77,10 @@ user_parser.add_argument('cardCvv', type=str)
 class UserbyUserUUIDResource(Resource):
     @marshal_with(user_fields, "data")
     def get(self, uuid):
-        user = db.session.query(User).filter(User.uuid == uuid).all()
+        try:
+            user = db.session.query(User).filter(User.uuid == uuid).all()
+        except:
+            return flask.jsonify()
         return user
 class UserResource(Resource):
     @ns_user.expect(user_parser)
@@ -113,7 +116,10 @@ product_parser.add_argument('price', type=float)
 class ProductResource(Resource):
     @marshal_with(product_fields, "data")
     def get(self):
-        productlist = db.session.query(Product).all()
+        try:
+            productlist = db.session.query(Product).all()
+        except:
+            return flask.jsonify()
         return productlist
 
     @ns_product.expect(product_parser)
@@ -131,7 +137,11 @@ class ProductResource(Resource):
 class ProductByProductIdResource(Resource):
     @marshal_with(product_fields, "data")
     def get(self, uuid):
-        product = db.session.query(Product).filter(Product.uuid == uuid).all()
+        try:
+            product = db.session.query(Product).filter(Product.uuid == uuid).all()
+        except:
+            return flask.jsonify()
+
         if not product:
             abort(404, message="Product {} doesn't exist".format(id))
         return product
@@ -139,23 +149,37 @@ class ProductByProductIdResource(Resource):
 class VoucherByUserIdResource(Resource):
     @marshal_with(voucher_fields, "data")
     def get(self, user_uuid):
-        voucherlist = db.session.query(Voucher).filter(Voucher.user_uuid == user_uuid).all()
+        try:
+            voucherlist = db.session.query(Voucher).filter(Voucher.user_uuid == user_uuid).all()
+        except:
+            return flask.jsonify()
+
         if not voucherlist:
-            abort(404, message="User {} doesn't have vouchers or doesn't exist".format(user_uuid))
+            #abort(404, message="User {} doesn't have vouchers or doesn't exist".format(user_uuid))
+            return flask.jsonify()
         return voucherlist
 
 class VoucherByVoucherCodeResource(Resource):
     @marshal_with(voucher_fields, "data")
     def get(self, code):
-        voucher = db.session.query(Voucher).filter(Voucher.code == code).all()
+        try:
+            voucher = db.session.query(Voucher).filter(Voucher.code == code).all()
+        except:
+            return flask.jsonify()
+        
         if not voucher:
-            abort(404, message="Voucher {} doesn't exist".format(id))
+            #abort(404, message="Voucher {} doesn't exist".format(id))
+            return flask.jsonify()
         return voucher
 
 class CartByUserIdResource(Resource):
     @marshal_with(cart_fields, "data")
     def get(self, user_uuid):
-        cartlist = db.session.query(Cart).filter(Cart.user_uuid == user_uuid).all()
+        try:
+            cartlist = db.session.query(Cart).filter(Cart.user_uuid == user_uuid).all()
+        except:
+            return flask.jsonify()
+
         if not cartlist:
             abort(404, message="User {} doesn't have carts or doesn't exist".format(user_uuid))
         return cartlist
@@ -163,7 +187,11 @@ class CartByUserIdResource(Resource):
 class CartByCartIdResource(Resource):
     @marshal_with(cart_fields, "data")
     def get(self, id):
-        cart = db.session.query(Cart).filter(Cart.id == id).all()
+        try:
+            cart = db.session.query(Cart).filter(Cart.id == id).all()
+        except:
+            return flask.jsonify()
+
         if not cart:
             abort(404, message="Cart {} doesn't exist".format(id))
         return cart
@@ -171,7 +199,11 @@ class CartByCartIdResource(Resource):
 class CartItemsByCartIdResource(Resource):
     @marshal_with(cartItem_fields, "data")
     def get(self, cart_id):
-        cartitemlist = db.session.query(CartItem).filter(CartItem.cart_id == cart_id).all()
+        try:
+            cartitemlist = db.session.query(CartItem).filter(CartItem.cart_id == cart_id).all()
+        except:
+            return flask.jsonify()
+
         if not cartitemlist:
             abort(404, message="Cart {} doesn't have any item or doesn't exist".format(cart_id))
         return cartitemlist
@@ -179,7 +211,11 @@ class CartItemsByCartIdResource(Resource):
 class CartItemsByCartItemIdResource(Resource):
     @marshal_with(cartItem_fields, "data")
     def get(self, id):
-        cartitem = db.session.query(CartItem).filter(CartItem.id == id).all()
+        try:
+            cartitem = db.session.query(CartItem).filter(CartItem.id == id).all()
+        except:
+            return flask.jsonify()
+
         if not cartitem:
             abort(404, message="CartItem {} doesn't exist".format(id))
         return cartitem
@@ -187,7 +223,8 @@ class CartItemsByCartItemIdResource(Resource):
 class CartSummaryByUserIdResource(Resource):
     @marshal_with(cartsummary_fields, "data")
     def get(self, user_uuid):
-        cartsummary = db.session.query(Cart.id,
+        try:
+            cartsummary = db.session.query(Cart.id,
                                     Cart.added_on, 
                                     Voucher.discount,
                                     func.sum(Product.price * (100-func.coalesce(Voucher.discount,0))/100).label("total")) \
@@ -197,6 +234,9 @@ class CartSummaryByUserIdResource(Resource):
                 .filter(Cart.user_uuid == user_uuid) \
                 .group_by(Cart.id, Cart.added_on, Voucher.discount) \
                 .all()
+        except:
+            return flask.jsonify()
+
         if not cartsummary:
             abort(404, message="Cart {} doesn't exist".format(id))
         return cartsummary
@@ -204,11 +244,15 @@ class CartSummaryByUserIdResource(Resource):
 class CartDetailByCartIdResource(Resource):
     @marshal_with(cartdetail_fields, "data")
     def get(self, cart_id):
-        cartdetail = db.session.query(Product.title,
+        try:
+            cartdetail = db.session.query(Product.title,
                                     Product.price) \
                 .join(CartItem, CartItem.product_uuid==Product.uuid) \
                 .filter(CartItem.cart_id == cart_id) \
                 .all()
+        except:
+            return flask.jsonify()
+
         if not cartdetail:
             abort(404, message="Cart {} doesn't exist".format(id))
         return cartdetail
