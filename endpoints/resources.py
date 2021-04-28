@@ -143,7 +143,7 @@ class ProductByProductIdResource(Resource):
             return flask.jsonify()
 
         if not product:
-            abort(404, message="Product {} doesn't exist".format(id))
+            return flask.jsonify()
         return product
 
 class VoucherByUserIdResource(Resource):
@@ -181,7 +181,7 @@ class CartByUserIdResource(Resource):
             return flask.jsonify()
 
         if not cartlist:
-            abort(404, message="User {} doesn't have carts or doesn't exist".format(user_uuid))
+            return flask.jsonify()
         return cartlist
 
 class CartByCartIdResource(Resource):
@@ -193,7 +193,7 @@ class CartByCartIdResource(Resource):
             return flask.jsonify()
 
         if not cart:
-            abort(404, message="Cart {} doesn't exist".format(id))
+            return flask.jsonify()
         return cart
 
 class CartItemsByCartIdResource(Resource):
@@ -205,7 +205,7 @@ class CartItemsByCartIdResource(Resource):
             return flask.jsonify()
 
         if not cartitemlist:
-            abort(404, message="Cart {} doesn't have any item or doesn't exist".format(cart_id))
+            return flask.jsonify()
         return cartitemlist
 
 class CartItemsByCartItemIdResource(Resource):
@@ -217,7 +217,7 @@ class CartItemsByCartItemIdResource(Resource):
             return flask.jsonify()
 
         if not cartitem:
-            abort(404, message="CartItem {} doesn't exist".format(id))
+            return flask.jsonify()
         return cartitem
 
 class CartSummaryByUserIdResource(Resource):
@@ -238,7 +238,7 @@ class CartSummaryByUserIdResource(Resource):
             return flask.jsonify()
 
         if not cartsummary:
-            abort(404, message="Cart {} doesn't exist".format(id))
+            return flask.jsonify()
         return cartsummary
 
 class CartDetailByCartIdResource(Resource):
@@ -254,7 +254,7 @@ class CartDetailByCartIdResource(Resource):
             return flask.jsonify()
 
         if not cartdetail:
-            abort(404, message="Cart {} doesn't exist".format(id))
+            return flask.jsonify()
         return cartdetail
 
 cart_parser = reqparse.RequestParser()
