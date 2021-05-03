@@ -41,7 +41,7 @@ voucher_fields = {
 cart_fields = {
     'id': fields.Integer,
     'user_uuid': fields.String,
-    'voucher_code': fields.Integer,
+    'voucher_code': fields.String,
     'added_on': fields.DateTime(dt_format='rfc822'),
     #'uri': fields.Url('cart', absolute=True),
 }
@@ -259,7 +259,7 @@ class CartDetailByCartIdResource(Resource):
 
 cart_parser = reqparse.RequestParser()
 cart_parser.add_argument('user_uuid', type=str)
-cart_parser.add_argument('voucher_code', type=int)
+cart_parser.add_argument('voucher_code', type=str)
 cart_parser.add_argument('total', type=Decimal)
 cart_parser.add_argument('product_uuid', action='append')
 
