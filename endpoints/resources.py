@@ -150,7 +150,7 @@ class VoucherByUserIdResource(Resource):
     @marshal_with(voucher_fields, "data")
     def get(self, user_uuid):
         try:
-            voucherlist = db.session.query(Voucher).filter(Voucher.user_uuid == user_uuid).all()
+            voucherlist = db.session.query(Voucher).filter(Voucher.user_uuid == user_uuid, Voucher.used == "false").all()
         except:
             return flask.jsonify()
 
